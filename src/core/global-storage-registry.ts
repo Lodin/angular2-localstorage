@@ -1,17 +1,8 @@
 import {StorageRegistry} from './storage-registry';
 
 export abstract class GlobalStorageRegistry {
-  public static local = new StorageRegistry();
-  public static session = new StorageRegistry();
-  private static _isInitialized = false;
-
-  public static initialize() {
-    GlobalStorageRegistry._isInitialized = true;
-  }
-
-  public static get isInitialized() {
-    return GlobalStorageRegistry._isInitialized;
-  }
+  public static readonly local = new StorageRegistry();
+  public static readonly session = new StorageRegistry();
 
   public static getRegistry(storage: Storage): StorageRegistry {
     switch (storage) {

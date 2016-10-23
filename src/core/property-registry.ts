@@ -6,7 +6,7 @@ export class PropertyRegistry {
     this._list.push(callback);
   }
 
-  public callAll(): void {
+  public emitAll(): void {
     for (const callback of this._list) {
       callback();
     }

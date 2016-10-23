@@ -23,7 +23,8 @@ module.exports = {
         test: /\.ts$/,
         loader: 'tslint-loader',
         exclude: [
-          path.resolve(projectRoot, 'node_modules')
+          /\.(e2e|spec)\.ts/,
+          /node_modules/
         ],
         query: {
           emitErrors: true,

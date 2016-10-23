@@ -1,6 +1,8 @@
 import * as deepEqual from 'deep-equal';
 import * as assignDeep from 'assign-deep';
-import {GlobalStorageRegistry, PropertyEmitter, StorageRegistry, buildKey} from '../core';
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+import 'rxjs/add/operator/pairwise';
+import {GlobalStorageRegistry, StorageRegistry, buildKey} from '../core';
 import {WebStorage} from './web-storage';
 
 export function makeDecorator(storage: Storage): any {
@@ -56,30 +58,32 @@ export function makeDecorator(storage: Storage): any {
           }
         }
       });
-    }
+    };
   };
 }
 
-function initProperty(instance: any,
-                      registry: StorageRegistry,
-                      storage: Storage,
-                      storageKey: string,
-                      mapped: string,
-                      options: WebStorage) {
-  const emitter = new PropertyEmitter();
+function initProperty(instance: any, registry: StorageRegistry, storage: Storage,
+                      storageKey: string, mapped: string, options: WebStorage) {
+  const subject = new BehaviorSubject(null);
   const restored = storage.getItem(storageKey);
 
   if (restored) {
     instance[mapped] = options.deserialize(restored);
   }
 
+  // Will be called every VM turn through ngZone's `onMicrotaskEmpty`
   registry.properties.register(() => {
-    emitter.emit(assignDeep({}, instance[mapped]));
+    subject.next(assignDeep({}, instance[mapped]));
   });
 
-  emitter.subscribe(([previous, current]: any[]) => {
-    if (!deepEqual(previous, current)) {
-      storage.setItem(storageKey, options.serialize(current));
-    }
-  });
+  // Receives previous and current value, and if them are not equal,
+  // writes new value to the localStorage
+  subject
+    .asObservable()
+    .pairwise()
+    .subscribe(([previous, current]: any[]) => {
+      if (!deepEqual(previous, current)) {
+        storage.setItem(storageKey, options.serialize(current));
+      }
+    });
 }
