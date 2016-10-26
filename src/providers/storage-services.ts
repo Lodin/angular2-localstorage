@@ -1,14 +1,13 @@
 import {Injectable, Inject, NgZone, Optional} from '@angular/core';
 import {SerealizationRule, GlobalStorageRegistry, ServiceConfig, buildKey, stripKey} from '../core';
 import {StorageServiceData} from './storage-service-data';
-import {StorageServiceAdapted} from './storage-service-adapted'
+import {StorageServiceAdapted} from './storage-service-adapted';
 
 export class StorageService {
   /** @internal */
   private _data: StorageServiceData = {
     registry: null,
-    storage: null,
-    zone: null
+    storage: null
   };
 
   /** @internal */
@@ -20,7 +19,10 @@ export class StorageService {
   constructor(storage: Storage, zone: NgZone, config: ServiceConfig) {
     this._data.storage = storage;
     this._data.registry = GlobalStorageRegistry.getRegistry(storage);
-    this._data.zone = zone;
+
+    if (!this._data.registry.isInitialized) {
+      this._data.registry.initialize(zone);
+    }
 
     if (config.prefix) {
       this._data.registry.globalPrefix = config.prefix;
@@ -41,25 +43,13 @@ export class StorageService {
     return keys;
   }
 
-  public init(): void {
-    if (GlobalStorageRegistry.isInitialized) {
-      return;
-    }
-
-    this._data.zone.onMicrotaskEmpty.subscribe(() => {
-      this._data.registry.properties.callAll();
-    });
-
-    GlobalStorageRegistry.initialize();
-  }
-
-  public adapt(instance: any) {
+  public adapt(instance: any): StorageServiceAdapted {
     const adapted = new StorageServiceAdapted(instance, this._data);
     this._adapted.set(instance, adapted);
     return adapted;
   }
 
-  public getAdapted(instance: any) {
+  public getAdapted(instance: any): any {
     return this._adapted.get(instance);
   }
 

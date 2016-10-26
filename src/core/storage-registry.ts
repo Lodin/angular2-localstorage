@@ -1,3 +1,4 @@
+import {NgZone} from '@angular/core';
 import {InstanceRegistry} from './instance-registry';
 import {PropertyRegistry} from './property-registry';
 
@@ -8,11 +9,15 @@ export class StorageRegistry {
   public readonly properties = new PropertyRegistry();
   private _isInitialized = false;
 
-  public initialize() {
+  public initialize(zone: NgZone): void {
+    zone.onMicrotaskEmpty.subscribe(() => {
+      this.properties.emitAll();
+    });
+
     this._isInitialized = true;
   }
 
-  public get isInitialized() {
+  public get isInitialized(): boolean {
     return this._isInitialized;
   }
 }
