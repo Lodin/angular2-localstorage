@@ -1,8 +1,8 @@
+import 'rxjs/add/operator/pairwise';
 import * as deepEqual from 'deep-equal';
 import * as assignDeep from 'assign-deep';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
-import 'rxjs/add/operator/pairwise';
-import {GlobalStorageRegistry, StorageRegistry, buildKey} from '../core';
+import {GlobalStorageRegistry, StorageRegistry, empty, buildKey} from '../core';
 import {WebStorage} from './web-storage';
 
 export function makeDecorator(storage: Storage): any {
@@ -26,7 +26,6 @@ export function makeDecorator(storage: Storage): any {
 
       const mapped = `_${property}_mapped`;
       const registry = GlobalStorageRegistry.getRegistry(storage);
-      const empty = Symbol('empty');
 
       Object.defineProperties(target, {
         [mapped]: {
@@ -71,7 +70,7 @@ function initProperty(instance: any, registry: StorageRegistry, storage: Storage
     instance[mapped] = options.deserialize(restored);
   }
 
-  // Will be called every VM turn through ngZone's `onMicrotaskEmpty`
+  // Will be called at every VM turn through ngZone's `onMicrotaskEmpty`
   registry.properties.register(() => {
     subject.next(assignDeep({}, instance[mapped]));
   });
