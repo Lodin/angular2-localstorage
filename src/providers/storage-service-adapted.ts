@@ -1,9 +1,9 @@
-import {SerealizationRule, buildKey, stripKey} from '../core';
+import {SerializationRule, buildKey, stripKey} from '../core';
 import {StorageServiceData} from './storage-service-data';
 
 export class StorageServiceAdapted {
   /** @internal */
-  private _serializationRule: SerealizationRule;
+  private _serializationRule: SerializationRule;
 
   constructor(private _instance: any, private _data: StorageServiceData) {}
 
@@ -18,29 +18,33 @@ export class StorageServiceAdapted {
   }
 
   public has(key: string): boolean {
-    return !!this._data.storage[buildKey(key, this._data.registry, this._instance)];
+    const builtKey = buildKey(key, this._data.registry, this._instance);
+    return !!this._data.storage.getItem(builtKey);
   }
 
   public get(key: string): any {
-    const data = this._data.storage.getItem(buildKey(key, this._data.registry, this._instance));
+    const builtKey = buildKey(key, this._data.registry, this._instance);
+    const data = this._data.storage.getItem(builtKey);
 
     return this._serializationRule.deserialize(data);
   }
 
   public remove(key: string): void {
-    this._data.storage.removeItem(buildKey(key, this._data.registry, this._instance));
+    const builtKey = buildKey(key, this._data.registry, this._instance);
+    this._data.storage.removeItem(builtKey);
   }
 
   public set(key: string, value: any): void {
-    const processed = this._serializationRule.serealize(value);
-    this._data.storage.setItem(buildKey(key, this._data.registry, this._instance), processed);
+    const serialized = this._serializationRule.serialize(value);
+    const builtKey = buildKey(key, this._data.registry, this._instance);
+    this._data.storage.setItem(builtKey, serialized);
   }
 
   public setPrefix(prefix: string): void {
     this._data.registry.prefixes.add(this._instance, prefix);
   }
 
-  public setSerealizationRule(rule: SerealizationRule): void {
+  public setSerealizationRule(rule: SerializationRule): void {
     this._serializationRule = rule;
   }
 
