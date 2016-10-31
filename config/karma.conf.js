@@ -35,9 +35,9 @@ module.exports = function (config) {
     port: 9877,
     colors: true,
     logLevel: config.LOG_INFO,
-    autoWatch: false,
+    autoWatch: true,
     browsers: ['Chrome'],
-    singleRun: true,
+    singleRun: false,
     concurrency: Infinity,
 
     noResolve: false,

@@ -23,10 +23,10 @@ module.exports = {
         test: /\.ts$/,
         loader: 'tslint-loader',
         exclude: [
-          /\.(e2e|spec)\.ts/,
+          /\.spec\.ts/,
           /node_modules/
         ],
-        query: {
+        options: {
           emitErrors: true,
           failOnHint: false,
           resourcePath: path.resolve(projectRoot)
@@ -35,35 +35,40 @@ module.exports = {
       },
       {
         test: /\.js$/,
+        enforce: 'pre',
         loader: 'source-map-loader',
         exclude: [
           path.resolve(projectRoot, 'node_modules/angular')
-        ],
+        ]
+      },
+      {
+        test: /\.js$/,
+        loader: 'source-map-loader',
+        exclude: [path.resolve(projectRoot, 'node_modules/angular')],
         enforce: 'pre'
       },
       {
         test: /\.ts$/,
-        loaders: [
+        use: [
           {
             loader: 'awesome-typescript-loader',
-            query: {
+            options: {
               tsconfig: path.resolve(srcRoot, 'tsconfig.json'),
               module: 'commonjs',
               target: 'es5',
               useForkChecker: true
             }
           }
-        ],
-        exclude: [/\.e2e\.ts$/]
+        ]
       },
       {
         test: /\.(js|ts)$/, loader: 'sourcemap-istanbul-instrumenter-loader',
+        enforce: 'post',
         exclude: [
-          /\.(e2e|spec)\.ts$/,
+          /\.spec\.ts$/,
           /node_modules/
         ],
-        query: { 'force-sourcemap': true },
-        enforce: 'post'
+        options: {'force-sourcemap': true}
       }
     ]
   },
