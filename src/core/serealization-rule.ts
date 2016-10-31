@@ -1,4 +1,4 @@
-export type SerealizationRule = {
-  serealize: (deserealized: any) => string;
-  deserialize: (serealized: string) => any;
+export type SerializationRule = {
+  serialize: (deserialized: any) => string;
+  deserialize: (serialized: string) => any;
 };

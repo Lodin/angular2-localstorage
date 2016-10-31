@@ -1,6 +1,6 @@
-import {SerealizationRule} from './serealization-rule';
+import {SerializationRule} from './serealization-rule';
 
 export class ServiceConfig {
-  prefix?: string;
-  serialization?: SerealizationRule;
+  public prefix?: string;
+  public serialization?: SerializationRule;
 }
