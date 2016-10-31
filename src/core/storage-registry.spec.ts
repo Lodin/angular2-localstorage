@@ -9,17 +9,29 @@ abstract class Mock {
   };
 }
 
+abstract class Backup {
+  public static readonly propertyRegistry = PropertyRegistryInjector.PropertyRegistry;
+}
+
 class Spy {
-  public readonly emitAll = jasmine.createSpy('emitAll');
+  public readonly propertyRegistry = {
+    emitAll: jasmine.createSpy('PropertyRegistry#emitAll')
+  };
 }
 
 describe('Class "StorageRegistry"', () => {
   let spy: Spy;
   let registry: StorageRegistry;
 
+  afterAll(() => {
+    (<any> PropertyRegistryInjector).PropertyRegistry = Backup.propertyRegistry;
+  });
+
   beforeEach(() => {
     spy = new Spy();
-    (<any> PropertyRegistryInjector).PropertyRegistry = class { public emitAll = spy.emitAll; };
+    (<any> PropertyRegistryInjector).PropertyRegistry = class {
+      public emitAll = spy.propertyRegistry.emitAll;
+    };
     registry = new StorageRegistry();
   });
 
@@ -32,6 +44,6 @@ describe('Class "StorageRegistry"', () => {
   it('should emit all property emitters on microtask empty event', () => {
     registry.initialize(Mock.zone);
     Mock.zone.onMicrotaskEmpty.next();
-    expect(spy.emitAll).toHaveBeenCalled();
+    expect(spy.propertyRegistry.emitAll).toHaveBeenCalled();
   });
 });
