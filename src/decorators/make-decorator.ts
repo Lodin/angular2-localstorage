@@ -1,6 +1,6 @@
 import 'rxjs/add/operator/pairwise';
 import * as deepEqual from 'deep-equal';
-import * as assignDeep from 'assign-deep';
+import * as clone from 'clone';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {GlobalStorageRegistry, StorageRegistry, empty, buildKey} from '../core';
 import {WebStorage} from './web-storage';
@@ -35,24 +35,21 @@ export function makeDecorator(storage: Storage): any {
           value: empty
         },
         [property]: {
+          enumerable: true,
+          configurable: true,
           get: function get() {
-            if (this[mapped] === empty) {
-              const storageKey = buildKey(options.key, registry, this);
-              initProperty(this, registry, storage, storageKey, mapped, options);
-            }
-
             return this[mapped];
           },
           set: function set(value: any) {
-            const storageKey = buildKey(options.key, registry, this);
+            let isSkipping = false;
 
             if (this[mapped] === empty) {
-              initProperty(this, registry, storage, storageKey, mapped, options);
+              const storageKey = buildKey(options.key, registry, this);
+              isSkipping = initProperty(this, registry, storage, storageKey, mapped, options);
             }
 
-            if (!deepEqual(value, this[mapped])) {
+            if (!isSkipping) {
               this[mapped] = value;
-              storage.setItem(storageKey, options.serialize(value));
             }
           }
         }
@@ -62,7 +59,7 @@ export function makeDecorator(storage: Storage): any {
 }
 
 function initProperty(instance: any, registry: StorageRegistry, storage: Storage,
-                      storageKey: string, mapped: string, options: WebStorage) {
+                      storageKey: string, mapped: string, options: WebStorage): boolean {
   const subject = new BehaviorSubject(null);
   const restored = storage.getItem(storageKey);
 
@@ -72,7 +69,7 @@ function initProperty(instance: any, registry: StorageRegistry, storage: Storage
 
   // Will be called at every VM turn through ngZone's `onMicrotaskEmpty`
   registry.properties.register(() => {
-    subject.next(assignDeep({}, instance[mapped]));
+    subject.next(clone(instance[mapped]));
   });
 
   // Receives previous and current value, and if them are not equal,
@@ -85,4 +82,6 @@ function initProperty(instance: any, registry: StorageRegistry, storage: Storage
         storage.setItem(storageKey, options.serialize(current));
       }
     });
+
+  return !!restored;
 }

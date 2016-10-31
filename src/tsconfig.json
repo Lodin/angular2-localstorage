@@ -21,6 +21,7 @@
     ],
     "types": [
       "deep-equal",
+      "clone",
       "jasmine"
     ]
   }
