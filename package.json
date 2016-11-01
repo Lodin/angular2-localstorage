@@ -1,7 +1,7 @@
 {
   "name": "angular2-localstorage",
   "version": "1.0.0-alpha.0",
-  "description": "Angular2 decorator to save and restore class properties automatically from any WebStorage.",
+  "description": "Angular2 services implements HTML5 Storage functionality for Angular2, including decorators for automatic restore properties",
   "main": "dist/index.js",
   "scripts": {
     "build": "npm run tsc && npm run remove:specs",
