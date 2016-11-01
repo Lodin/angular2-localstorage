@@ -1,11 +1,12 @@
-import {SerializationRule, buildKey, stripKey} from '../core';
+import {SerializationRule, StorageOperator, buildKey, stripKey} from '../core';
 import {StorageServiceData} from './storage-service-data';
 
-export class StorageServiceAdapted {
-  /** @internal */
-  private _serializationRule: SerializationRule;
-
-  constructor(private _instance: any, private _data: StorageServiceData) {}
+export class StorageServiceAdapted implements StorageOperator {
+  constructor(
+    private _instance: any,
+    private _data: StorageServiceData,
+    private _serializationRule: SerializationRule
+  ) {}
 
   public get keys(): string[] {
     const keys = new Array(this._data.storage.length);

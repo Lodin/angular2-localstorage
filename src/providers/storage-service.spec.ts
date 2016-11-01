@@ -18,6 +18,10 @@ abstract class Mock {
   public static readonly item = 'testItem';
   public static readonly anotherItem = 'testAnotherItem';
   public static readonly adapted = {adapted: true};
+  public static readonly defaultSerializatonRule = {
+    serialize: JSON.stringify,
+    deserialize: JSON.parse
+  };
 }
 
 class Spy {
@@ -107,7 +111,7 @@ describe('Service "StorageService"', () => {
     expect(spy.storageServiceAdapted).toHaveBeenCalledWith(instance, {
       registry: spy.registry,
       storage: spy.storage
-    });
+    }, Mock.defaultSerializatonRule);
   });
 
   it('should get adapted service for instance', () => {

@@ -1,9 +1,16 @@
 import {NgZone} from '@angular/core';
-import {SerializationRule, GlobalStorageRegistry, ServiceConfig, buildKey, stripKey} from '../core';
+import {
+  SerializationRule,
+  GlobalStorageRegistry,
+  ServiceConfig,
+  StorageOperator,
+  buildKey,
+  stripKey
+} from '../core';
 import {StorageServiceData} from './storage-service-data';
 import {StorageServiceAdapted} from './storage-service-adapted';
 
-export class StorageService {
+export class StorageService implements StorageOperator {
   /** @internal */
   private _data: StorageServiceData = {
     registry: null,
@@ -49,7 +56,7 @@ export class StorageService {
   }
 
   public adapt(instance: any): StorageServiceAdapted {
-    const adapted = new StorageServiceAdapted(instance, this._data);
+    const adapted = new StorageServiceAdapted(instance, this._data, this._serializationRule);
     this._adapted.set(instance, adapted);
     return adapted;
   }

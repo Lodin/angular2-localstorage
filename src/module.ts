@@ -5,10 +5,10 @@ import {LocalStorageService, SessionStorageService} from './providers';
 @NgModule({
   providers: [LocalStorageService, SessionStorageService]
 })
-export class NgStorageModule {
+export class Ng2StorageModule {
   public static forRoot(config?: ServiceConfig) {
     return {
-      ngModule: NgStorageModule,
+      ngModule: Ng2StorageModule,
       providers: [
         {provide: ServiceConfig, useValue: config}
       ]

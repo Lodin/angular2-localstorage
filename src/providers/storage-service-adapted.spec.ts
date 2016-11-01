@@ -62,7 +62,7 @@ describe('Class "StorageServiceAdapted"', () => {
     service = new StorageServiceAdapted(instance, {
       registry: <any> spy.registry,
       storage: <any> spy.storage
-    });
+    }, Mock.serializationRule);
     (<any> service)._serializationRule = spy.serializationRule;
   });
 
